@@ -2,6 +2,7 @@ package rmi;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.io.IOException;
 
 /**
@@ -10,12 +11,22 @@ import java.io.IOException;
  * http://tutorials.jenkov.com/java-multithreaded-servers/multithreaded-server.html
  * https://blog.eduonix.com/java-programming-2/learn-create-multi-threaded-server-java/
  */
-class TCPServer implements Runnable {
+class TCPServer<T> implements Runnable {
     protected ServerSocket serverSocket;
     protected stopped = true;
 
-    public TCPServer() {
+    protected T remoteObject;
+
+    static final DEFAULT_BACKLOG = 100;
+
+    public TCPServer(T remoteObject) throws IOException {
         this.serverSocket = new ServerSocket();
+        this.remoteObject = remoteObject;
+    }
+
+    public TCPServer(InetSocketAddress ipSocketAddress, T remoteObject) throws IOException {
+        this.serverSocket = new ServerSocket(ipSocketAddress.getPort(), DEFAULT_BACKLOG, ipSocketAddress.getAddress());
+        this.remoteObject = remoteObject;
     }
 
     public void run() {
